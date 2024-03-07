@@ -12,6 +12,16 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
+// Define the PWM settings
+#define PWM_CHANNEL 0
+#define PWM_FREQ    50 // 50Hz
+#define PWM_RESOLUTION 12 // 10-bit resolution for duty cycle
+// Define the pin for PWM output
+#define PWM_PIN 22
+
+
+
+
 // Structure example to receive data
 // Must match the sender structure
 typedef struct struct_message {
@@ -27,13 +37,25 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   Serial.print("Bytes received: ");
   Serial.println(len);
   Serial.print("Int: ");
-  Serial.println(myData.a
-  );
+  Serial.println(myData.a);
+  Serial.println("You are here");
+  int dutyCycle = myData.a * 0.1; // 10% of the maximum duty cycle (1023 for 10-bit resolution)
+  
+  // Write duty cycle value to the PWM channel
+  ledcWrite(PWM_CHANNEL, dutyCycle);
 }
  
 void setup() {
   // Initialize Serial Monitor
   Serial.begin(115200);
+
+ // Configure PWM channel
+  ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
+  
+  // Attach the PWM channel to the GPIO pin
+  ledcAttachPin(PWM_PIN, PWM_CHANNEL);
+
+  
   
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);

@@ -14,6 +14,9 @@
 
 // REPLACE WITH YOUR RECEIVER MAC Address
 uint8_t broadcastAddress[] = {0x54, 0x43, 0xB2, 0xFB, 0xAE, 0x10};
+//B0:A7:32:14:BC:BC
+//0x54, 0x43, 0xB2, 0xFB, 0xAE, 0x10
+
 
 // Structure example to send data
 // Must match the receiver structure
