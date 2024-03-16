@@ -1,14 +1,3 @@
-/*
-  Rui Santos
-  Complete project details at https://RandomNerdTutorials.com/esp-now-esp32-arduino-ide/
-  
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files.
-  
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
-*/
-
 #include <esp_now.h>
 #include <WiFi.h>
 
@@ -21,7 +10,8 @@ uint8_t broadcastAddress[] = {0x54, 0x43, 0xB2, 0xFB, 0xAE, 0x10};
 // Structure example to send data
 // Must match the receiver structure
 typedef struct struct_message {
-  int a;
+  int right;
+  int left;
 } struct_message;
 
 // Create a struct_message called myData
@@ -68,9 +58,11 @@ void setup() {
   
 void loop() {
   // Set values to send
-  myData.a = analogRead(32);
+  myData.right = analogRead(32);
+  myData.left = analogRead(35);
   Serial.println(analogRead(32));
-  Serial.println(myData.a);
+  Serial.println(analogRead(35));
+  Serial.println(myData.right);
   // Send message via ESP-NOW
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
    

@@ -2,27 +2,35 @@
 //#include <ledc.h>
 
 // Define the PWM settings
-#define PWM_CHANNEL 0
+#define PWM_CHANNEL1 0
+#define PWM_CHANNEL2 2
 #define PWM_FREQ    50 // 50Hz
 #define PWM_RESOLUTION 10 // 10-bit resolution for duty cycle
 
 // Define the pin for PWM output
-#define PWM_PIN 22
+#define PWM_PIN1 22
+#define PWM_PIN2 23
+
 
 void setup() {
   // Configure PWM channel
-  ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
+  ledcSetup(PWM_CHANNEL1, PWM_FREQ, PWM_RESOLUTION);
+  ledcSetup(PWM_CHANNEL2, PWM_FREQ, PWM_RESOLUTION);
   
   // Attach the PWM channel to the GPIO pin
-  ledcAttachPin(PWM_PIN, PWM_CHANNEL);
+  ledcAttachPin(PWM_PIN1, PWM_CHANNEL1);
+  ledcAttachPin(PWM_PIN2, PWM_CHANNEL2);
+  
 }
 
 void loop() {
   // Set duty cycle to 10%
-  int dutyCycle = 1023 * 0.1; // 10% of the maximum duty cycle (1023 for 10-bit resolution)
+  int dutyCycle1 = 1023 * 0.1; // 10% of the maximum duty cycle (1023 for 10-bit resolution)
+  int dutyCycle2 = 1023 * 0.2;
   
   // Write duty cycle value to the PWM channel
-  ledcWrite(PWM_CHANNEL, dutyCycle);
+  ledcWrite(PWM_CHANNEL1, dutyCycle1);
+  ledcWrite(PWM_CHANNEL2, dutyCycle2);
 }
 
 
