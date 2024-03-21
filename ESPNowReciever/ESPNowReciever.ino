@@ -32,8 +32,8 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   Serial.println(myData.right);
   Serial.print("Int 2: ");
   Serial.print(myData.left);
-  int dutyCycleRight = myData.right * 0.1; // 10% of the maximum duty cycle (12-bit resolution)
-  int dutyCycleLeft = myData.left * 0.1;
+  int dutyCycleRight = (myData.right * 0.04) + 205; // 10% of the maximum duty cycle (12-bit resolution)
+  int dutyCycleLeft = (myData.left * 0.04) +205;
   // Write duty cycle value to the PWM channel
   ledcWrite(PWM_CHANNEL1, dutyCycleRight);
   ledcWrite(PWM_CHANNEL2, dutyCycleLeft);

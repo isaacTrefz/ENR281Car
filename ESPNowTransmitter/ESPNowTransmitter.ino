@@ -58,11 +58,13 @@ void setup() {
   
 void loop() {
   // Set values to send
-  myData.right = analogRead(32);
-  myData.left = analogRead(35);
-  Serial.println(analogRead(32));
-  Serial.println(analogRead(35));
+  myData.right = (pow(analogRead(32)-2047,3)/4192256) + 2047;
+  myData.left = (pow(analogRead(35)-2047,3)/4192256) + 2047;
+
+  //Serial.println(analogRead(32));
+  //Serial.println(analogRead(35));
   Serial.println(myData.right);
+  Serial.println(myData.left);
   // Send message via ESP-NOW
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
    
