@@ -44,11 +44,11 @@ class buttonCounter {
 
     void updateTriming(){
       if(digitalRead(33)== 0 && rightPreviousState == 1){
-        triming++;
+        triming += 5;
       }
 
       if(digitalRead(32)== 0 && leftPreviousState == 1){
-        triming--;
+        triming -= 5;
       }
 
       rightPreviousState = digitalRead(33);
@@ -106,18 +106,18 @@ void loop() {
   float dampingFactor = float(analogRead(34))/float(4095);
   int devisor = pow(dampingFactor*2047,2);
   // Set values to send
-  if(digitalRead(19)==1){
+  if(digitalRead(19)==1){                           //taank drive mode
   myData.right = (pow(dampingFactor*(analogRead(39)-2047),3)/devisor) + 2047;
   myData.left =  (pow(dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
   }
 
-  else{
+  else{                                             //mario kart mode
     if(analogRead(35)>=2047){//turning right
       float turningDampingFactor = analogRead(35)/2047;
       myData.right = (pow(dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
       myData.left =  (pow(turningDampingFactor*dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
     }
-    else{//turning left
+    else{
       float turningDampingFactor = (4095-analogRead(35))/2047;
       myData.right = (pow(turningDampingFactor*dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
       myData.left =  (pow(dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
@@ -133,6 +133,15 @@ void loop() {
 
   if(digitalRead(18)==0){
     swapInt(&myData.right, &myData.left);
+  }
+
+  if(myData.right > 2047 && myData.left > 2047){
+    if(triming.triming > 0){
+      myData.right -= triming.triming;
+    }
+    else {
+      myData.left += triming.triming;
+    }
   }
   
   triming.updateTriming();
