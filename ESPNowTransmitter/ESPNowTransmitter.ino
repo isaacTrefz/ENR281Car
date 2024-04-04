@@ -24,10 +24,56 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   Serial.print("\r\nLast Packet Send Status:\t");
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
 }
+
+
+void swapInt(int*a, int *b) {
+  int c = *a;
+  *a = *b;
+  *b = c;
+}
+
+
+class buttonCounter {
+
+  private:
+    int leftPreviousState = 1;
+    int rightPreviousState = 1;
+    
+  public:
+    int triming = 0;
+
+    void updateTriming(){
+      if(digitalRead(33)== 0 && rightPreviousState == 1){
+        triming++;
+      }
+
+      if(digitalRead(32)== 0 && leftPreviousState == 1){
+        triming--;
+      }
+
+      rightPreviousState = digitalRead(33);
+      leftPreviousState = digitalRead(32);
+        
+     }
+};
+
+  buttonCounter triming;
+
+
+
+
+
+
+
  
 void setup() {
   // Init Serial Monitor
   Serial.begin(115200);
+  pinMode(33, INPUT);
+  pinMode(32, INPUT);
+  pinMode(18, INPUT);
+  pinMode(19, INPUT);
+
 
   analogReadResolution(12);
  
@@ -57,22 +103,69 @@ void setup() {
 }
   
 void loop() {
+  float dampingFactor = float(analogRead(34))/float(4095);
+  int devisor = pow(dampingFactor*2047,2);
   // Set values to send
-  myData.right = (pow(analogRead(32)-2047,3)/4192256) + 2047;
-  myData.left = (pow(analogRead(35)-2047,3)/4192256) + 2047;
+  if(digitalRead(19)==1){
+  myData.right = (pow(dampingFactor*(analogRead(39)-2047),3)/devisor) + 2047;
+  myData.left =  (pow(dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
+  }
 
-  //Serial.println(analogRead(32));
-  //Serial.println(analogRead(35));
-  Serial.println(myData.right);
+  else{
+    if(analogRead(35)>=2047){//turning right
+      float turningDampingFactor = analogRead(35)/2047;
+      myData.right = (pow(dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
+      myData.left =  (pow(turningDampingFactor*dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
+    }
+    else{//turning left
+      float turningDampingFactor = (4095-analogRead(35))/2047;
+      myData.right = (pow(turningDampingFactor*dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
+      myData.left =  (pow(dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
+      
+      }
+
+    
+      
+    }
+    
+
+
+
+  if(digitalRead(18)==0){
+    swapInt(&myData.right, &myData.left);
+  }
+  
+  triming.updateTriming();
+  Serial.println(triming.triming);
+  /*Serial.println(myData.right);
   Serial.println(myData.left);
+  
+  Serial.print("Left Right Data: ");
+  Serial.println(analogRead(35));
+
+  Serial.print("Button 1: ");
+  Serial.println(digitalRead(33));
+
+  Serial.print("Button 2: ");
+  Serial.println(digitalRead(32));
+
+  Serial.print("Switch 1: ");
+  Serial.println(digitalRead(19));
+
+  Serial.print("Switch 2: ");
+  Serial.println(digitalRead(18));*/
+
+
+  
+  
   // Send message via ESP-NOW
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
    
   if (result == ESP_OK) {
-    Serial.println("Sent with success");
+    //Serial.println("Sent with success");
   }
   else {
-    Serial.println("Error sending the data");
+    //Serial.println("Error sending the data");
   }
   delay(50);
 }
