@@ -10,6 +10,10 @@
 #define PWM_PIN1 22
 #define PWM_PIN2 23
 
+int rightDirection = 1;
+int leftDirection = 1;
+int dutyCycleLeft;
+int dutyCycleRight;
 
 
 
@@ -23,6 +27,8 @@ typedef struct struct_message {
 // Create a struct_message called myData
 struct_message myData;
 
+
+
 // callback function that will be executed when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   memcpy(&myData, incomingData, sizeof(myData));
@@ -31,13 +37,64 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   Serial.print("Int 1: ");
   Serial.println(myData.right);
   Serial.print("Int 2: ");
-  Serial.print(myData.left);
-  int dutyCycleRight = (myData.right * 0.04) + 205; // 10% of the maximum duty cycle (12-bit resolution)
-  int dutyCycleLeft = (myData.left * 0.04) +205;
+  Serial.println(myData.left);
+
+
+
+
+  if(myData.left < 1200){                               //left wheel reverse restart
+    if(leftDirection == 1){
+          dutyCycleLeft = (myData.left * 0.04) +205;
+          ledcWrite(PWM_CHANNEL2, dutyCycleLeft);
+          delay(50);
+          dutyCycleLeft = 286;
+          ledcWrite(PWM_CHANNEL2, dutyCycleLeft);
+          delay(50);
+          leftDirection = 0;
+    }
+    else{
+      int dutyCycleLeft = (myData.left * 0.04) +205;
+      ledcWrite(PWM_CHANNEL2, dutyCycleLeft);
+    }
+  }
+  else{                                                 //left wheel standard mode
+    leftDirection = 1;
+    int dutyCycleLeft = (myData.left * 0.04) +205;
+    ledcWrite(PWM_CHANNEL2, dutyCycleLeft);
+    Serial.println(dutyCycleLeft);
+  }
+
+
+
+  if(myData.right < 1200){                               //right wheel reverse restart
+    if(rightDirection == 1){
+          dutyCycleRight = (myData.right * 0.04) +205;
+          ledcWrite(PWM_CHANNEL1, dutyCycleRight);
+          Serial.println("you are here");
+          delay(50);
+          dutyCycleRight = 286;
+          ledcWrite(PWM_CHANNEL1, dutyCycleLeft);
+          delay(50);
+          rightDirection = 0;
+    }
+    else{
+      int dutyCycleRight = (myData.right * 0.04) +205;
+      ledcWrite(PWM_CHANNEL1, dutyCycleRight);
+    }
+  }
+  else{                                                 //right wheel standard mode
+    rightDirection = 1;
+    int dutyCycleRight = (myData.right * 0.04) +205;
+    ledcWrite(PWM_CHANNEL1, dutyCycleRight);
+  }
+ 
+ // int dutyCycleRight = (myData.right * 0.04) + 205; // 10% of the maximum duty cycle (12-bit resolution)
+  
   // Write duty cycle value to the PWM channel
-  ledcWrite(PWM_CHANNEL1, dutyCycleRight);
-  ledcWrite(PWM_CHANNEL2, dutyCycleLeft);
+  //ledcWrite(PWM_CHANNEL1, dutyCycleRight);
+
 }
+
  
 void setup() {
   // Initialize Serial Monitor

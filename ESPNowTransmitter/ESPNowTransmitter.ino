@@ -2,9 +2,10 @@
 #include <WiFi.h>
 
 // REPLACE WITH YOUR RECEIVER MAC Address
-uint8_t broadcastAddress[] = {0x54, 0x43, 0xB2, 0xFB, 0xAE, 0x10};
+uint8_t broadcastAddress[] = {0xE8, 0x6B, 0xEA, 0xCF, 0xAE, 0xEC};
 //B0:A7:32:14:BC:BC
-//0x54, 0x43, 0xB2, 0xFB, 0xAE, 0x10
+//0x54, 0x43, 0xB2, 0xFB, 0xAE, 0x10   E8:6B:EA:CF:AE:EC
+
 
 
 // Structure example to send data
@@ -111,14 +112,22 @@ void loop() {
   myData.left =  (pow(dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
   }
 
-  else{                                             //mario kart mode
+
+  
+
+  else{      //mario kart mode
+    
+    
+    
+    
+
     if(analogRead(35)>=2047){//turning right
-      float turningDampingFactor = analogRead(35)/2047;
+      float turningDampingFactor = (analogRead(35)/2047);
       myData.right = (pow(dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
       myData.left =  (pow(turningDampingFactor*dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
     }
     else{
-      float turningDampingFactor = (4095-analogRead(35))/2047;
+      float turningDampingFactor = ((4095-analogRead(35))/2047);
       myData.right = (pow(turningDampingFactor*dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
       myData.left =  (pow(dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
       
