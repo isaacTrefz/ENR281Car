@@ -2,7 +2,7 @@
 #include <WiFi.h>
 
 // REPLACE WITH YOUR RECEIVER MAC Address
-uint8_t broadcastAddress[] = {0xE8, 0x6B, 0xEA, 0xCF, 0xAE, 0xEC};
+uint8_t broadcastAddress[] = {0xE8, 0x6B, 0xEA, 0xCF, 0x22, 0x94};
 //B0:A7:32:14:BC:BC
 //0x54, 0x43, 0xB2, 0xFB, 0xAE, 0x10   E8:6B:EA:CF:AE:EC
 
@@ -107,6 +107,8 @@ void loop() {
   float dampingFactor = float(analogRead(34))/float(4095);
   int devisor = pow(dampingFactor*2047,2);
   // Set values to send
+
+  
   if(digitalRead(19)==1){                           //taank drive mode
   myData.right = (pow(dampingFactor*(analogRead(39)-2047),3)/devisor) + 2047;
   myData.left =  (pow(dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
@@ -116,22 +118,25 @@ void loop() {
   
 
   else{      //mario kart mode
-    
-    
-    
-    
 
-    if(analogRead(35)>=2047){//turning right
-      float turningDampingFactor = (analogRead(35)/2047);
-      myData.right = (pow(dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
-      myData.left =  (pow(turningDampingFactor*dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
-    }
-    else{
-      float turningDampingFactor = ((4095-analogRead(35))/2047);
-      myData.right = (pow(turningDampingFactor*dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
-      myData.left =  (pow(dampingFactor*(analogRead(36)-2047),3)/devisor) + 2047;
-      
-      }
+    int fowardBackShifted = (analogRead(36)-2047)/2;
+    int leftRightShifted = (analogRead(35)-2047)/2;
+    float a = (0.5*dampingFactor)+0.5;
+    float b = 2*(1-(float(b)/2));
+
+
+    /*if(leftRightShifted > 2047){
+          myData.right = (1.3*fowardBackShifted) + (0.7*leftRightShifted) + 2047;
+          myData.left = (1.3*fowardBackShifted) - (0.7*leftRightShifted) + 2047;
+    }*/
+
+    Serial.print("                    ");
+    Serial.println(a);
+    Serial.print("                  ");
+    Serial.println(b);
+    myData.right = dampingFactor*((a*1.3*fowardBackShifted) + (b*0.7*leftRightShifted)) + 2047;
+    myData.left = dampingFactor*((a*1.3*fowardBackShifted) - (b*0.7*leftRightShifted)) + 2047;
+    
 
     
       
@@ -154,11 +159,15 @@ void loop() {
   }
   
   triming.updateTriming();
+  Serial.print("Trim: ");
   Serial.println(triming.triming);
-  /*Serial.println(myData.right);
+
+  Serial.print("Right: ");
+  Serial.println(myData.right);\
+  Serial.print("Left: ");
   Serial.println(myData.left);
   
-  Serial.print("Left Right Data: ");
+  /*Serial.print("Left Right Data: ");
   Serial.println(analogRead(35));
 
   Serial.print("Button 1: ");

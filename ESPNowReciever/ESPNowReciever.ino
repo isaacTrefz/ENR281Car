@@ -42,7 +42,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 
 
 
-  if(myData.left < 1200){                               //left wheel reverse restart
+  if(myData.left < 1000){                               //left wheel reverse restart
     if(leftDirection == 1){
           dutyCycleLeft = (myData.left * 0.04) +205;
           ledcWrite(PWM_CHANNEL2, dutyCycleLeft);
@@ -66,7 +66,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 
 
 
-  if(myData.right < 1200){                               //right wheel reverse restart
+  if(myData.right < 1000){                               //right wheel reverse restart
     if(rightDirection == 1){
           dutyCycleRight = (myData.right * 0.04) +205;
           ledcWrite(PWM_CHANNEL1, dutyCycleRight);
